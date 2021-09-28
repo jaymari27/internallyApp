@@ -1,0 +1,16 @@
+TR-205 Culmination of Learning Part 1
+× 001:    Can create and display a Thought
+× 002:    Can edit a Thought
+× 003:    Can change status (Done⇒Not Done and vice versa)
+× 004:    Can delete a Thought
+
+REFACTOR:
+× Can perform CRUD when there are multiple entries.
+⇒ User must not be able to create already existing Thoughts
+  ・ This way, we can filter by thought contents when deleting.
+
+TR-323 Culmination of Learning Part 2 (Additinal Functionalities)
+006:    Can login and logout
+007:    Can minimize and maximize longer Thoughts
+008:    Deleting Thoughts will have an animation
+009:    Can add priority level per task

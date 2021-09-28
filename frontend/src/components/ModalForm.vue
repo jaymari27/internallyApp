@@ -6,16 +6,16 @@
           <textarea
             class="modal-compose__text"
             placeholder="What's on your mind?"
-            v-model="thoughtContent"
+            v-model="current_content"
           />
           <button
             class="btn__submit-thought"
-            @disabled="thoughtContent.length > 0"
+            @disabled="current_content.length > 0"
             @click="editThought"
           >
             Save Changes
           </button>
-          <button class="btn__cancel" @click="closeModal">Cancel</button>
+          <button class="btn__cancel" @click="modalCtrl">Cancel</button>
         </form>
       </div>
     </div>
@@ -24,23 +24,26 @@
 
 <script>
 export default {
-  props: ["modalIsShown", "showModal", "toEdit"],
-  emits: ["editThought", "closeModal"],
+  props: ["toEdit"],
+  emits: ["modalCtrl", "editThoughts"],
   data() {
     return {
-      thoughtContent: ""
+      current_content: "",
+      thought_id: ""
     };
   },
   methods: {
     editThought() {
-      this.$emit("editThought", this.thoughtContent);
+      this.$emit("editThought", this.current_content);
+      this.modalCtrl();
     },
-    closeModal() {
-      this.$emit("closeModal", this.modalIsShown);
+    modalCtrl() {
+      this.$emit("modalCtrl", this.modalIsShown);
     }
   },
   beforeMount() {
-    this.thoughtContent = this.toEdit.thought_content;
+    this.thought_id = this.toEdit.thought_id;
+    this.current_content = this.toEdit.thought_content;
   }
 };
 </script>

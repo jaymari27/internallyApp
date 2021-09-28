@@ -1,23 +1,22 @@
 <template>
-  <section>
+  <div>
     <div class="nav">
       <div class="user__current">
         <ion-icon class="user__current-icon" name="logo-octocat"></ion-icon>
         <h3 class="user__current-author">
-          {{ currentUser.displayname }}
+          Marius 陆景和
         </h3>
-        <h5 class="user__current-slug">@{{ currentUser.username }}</h5>
+        <h5 class="user__current-slug">@MVHKing</h5>
       </div>
       <div class="btn btn-post" @click="showCompose">
         Create a Thought
       </div>
     </div>
-  </section>
+  </div>
 </template>
 
 <script>
 export default {
-  props: ["currentUser", "composeIsShown"],
   emit: ["showCompose"],
   methods: {
     showCompose() {
@@ -29,12 +28,10 @@ export default {
 
 <style scoped>
 div {
-  margin: 1rem 0;
+  margin: 0.3rem 0;
 }
 
 .nav {
-  padding: 0 1rem;
-  margin: 0;
   display: flex;
   flex-direction: column;
   position: fixed;
@@ -79,6 +76,7 @@ div {
   font-size: 80%;
   font-weight: bold;
   bottom: 0;
+  width: 100%;
 }
 
 .btn-post:hover {

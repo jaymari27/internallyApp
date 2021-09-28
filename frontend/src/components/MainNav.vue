@@ -12,7 +12,7 @@
             <button
               class="btn__submit-thought"
               :disabled="!newThought.length > 0"
-              @click="addNewThought"
+              @click="addNewThought(-1, newThought)"
             >
               Post
             </button>
@@ -20,38 +20,44 @@
         </form>
       </div>
     </transition>
-    <div v-if="displayedThoughts.length > 0">
-      <div
-        class="thoughts__container"
-        v-for="(thought, i) in displayedThoughts"
-        :key="thought.thought_id"
-      >
-        <h4 class="thoughts__author">
-          {{ currentUser.displayname }}
-        </h4>
-        <h5 class="thoughts__author-slug">@{{ currentUser.username }}</h5>
-        <p class="thoughts__thought-content">
-          {{ thought.thought_content }}
-        </p>
-        <div class="btn-div">
-          <button class="btn__edit" @click="showModal(thought.thought_id)">
-            Edit
-          </button>
-          <button
-            class="btn__status"
-            :class="{ statusOngoing: !thought.isDone }"
-            @click="changeStatus(thought.thought_id)"
-          >
-            {{ thought.isDone ? "Mark as Not Done" : "Mark as Done" }}
-          </button>
-          <button
-            class="btn__delete"
-            @click="deleteThought(thought.thought_id)"
-          >
-            Delete Thought
-          </button>
+    <div v-if="thoughtList.length != 0">
+      <transition-group name="fade">
+        <div
+          class="thoughts__container"
+          v-for="(thought, i) in thoughtList.slice().reverse()"
+          :key="thought.thought_id"
+        >
+          <h4 class="thoughts__author">
+            Marius 陆景和
+          </h4>
+          <h5 class="thoughts__author-slug">@MVHKing</h5>
+          <p class="thoughts__thought-content">
+            {{ thought.thought_content }}
+          </p>
+          <div class="btn-div">
+            <button
+              class="btn__edit"
+              @click="modalCtrl(thought.thought_id, thought.thought_content)"
+              :disabled="thought.is_done"
+            >
+              Edit
+            </button>
+            <button
+              class="btn__status"
+              :class="{ statusOngoing: !thought.is_done }"
+              @click="changeStatus(thought.thought_id, thought.is_done)"
+            >
+              {{ thought.is_done ? "Mark as Not Done" : "Mark as Done" }}
+            </button>
+            <button
+              class="btn__delete"
+              @click="deleteThought(thought.thought_id, true)"
+            >
+              Delete Thought
+            </button>
+          </div>
         </div>
-      </div>
+      </transition-group>
     </div>
     <div class="thoughts__container" v-else>
       No thoughts, head empty.
@@ -61,44 +67,67 @@
 
 <script>
 export default {
-  emits: ["changeStatus", "deleteThought", "addNewThought", "showModal"],
-  props: ["currentUser", "thoughtList", "composeIsShown", "modalIsShown"],
+  emits: ["modalCtrl"],
+  props: ["composeIsShown", "modalIsShown", "updatedThought"],
   data() {
     return {
-      newThought: ""
+      newThought: "",
+      thoughtList: [],
+      path: "http://127.0.0.1:5000/thoughts"
     };
   },
-  computed: {
-    displayedThoughts() {
-      return (this.userThoughts = this.thoughtList.filter(
-        user => user.author_id === this.currentUser.id
-      ));
-    }
+  created() {
+    this.getThoughts();
   },
   methods: {
-    changeStatus(id) {
-      this.$emit("changeStatus", id);
+    getThoughts() {
+      this.axios
+        .get(this.path)
+        .then(response => (this.thoughtList = response.data))
+        .catch(err => {
+          console.error(err);
+        });
     },
-    deleteThought(id) {
-      this.$emit("deleteThought", id);
-    },
-    addNewThought() {
-      let newThought = {
-        thought_id: this.thoughtList.length + 1,
-        author_id: this.currentUser.id,
-        thought_content: this.newThought,
-        isDone: false,
-        priority: "low"
+    editThought(thought_id, thought_content) {
+      const data = {
+        thought_id: thought_id,
+        thought_content: thought_content
       };
-
-      this.newThought = "";
-      this.$emit("addNewThought", newThought);
+      console.log(data);
+      this.axios.post(this.path, data).then(() => this.getThoughts());
     },
-    showModal(id) {
-      this.$emit("showModal", {
+    changeStatus(thought_id, is_done) {
+      const data = {
+        thought_id: thought_id,
+        is_done: !is_done
+      };
+      this.axios.post(this.path, data).then(() => this.getThoughts());
+    },
+    deleteThought(thought_id, to_delete) {
+      const data = {
+        thought_id: thought_id,
+        to_delete: to_delete
+      };
+      this.axios.post(this.path, data).then(() => this.getThoughts());
+    },
+    addNewThought(thought_id, thought_content) {
+      const data = {
+        thought_id: thought_id,
+        thought_content: thought_content,
+        is_done: false,
+        to_delete: false
+      };
+      this.axios.post(this.path, data).then(() => this.getThoughts());
+
+      this.newThought = ""; // Empty textarea
+    },
+    modalCtrl(thought_id, thought_content) {
+      this.$emit("modalCtrl", {
         isShown: this.modalIsShown,
-        id
+        thought_id,
+        thought_content
       });
+      this.editThought(thought_id, this.updatedThought);
     }
   }
 };

@@ -1,5 +1,5 @@
 <template>
-  <section>
+  <section class="header">
     <h1><ion-icon class="logo" name="leaf"></ion-icon>internally</h1>
   </section>
 </template>
@@ -7,7 +7,7 @@
 <style scoped>
 @import url("https://fonts.googleapis.com/css2?family=Petit+Formal+Script&display=swap");
 
-section {
+.header {
   background-color: rgb(141, 212, 132);
   text-align: left;
   box-shadow: 0.5px 1px 3px rgb(158, 158, 158);
